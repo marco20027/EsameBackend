@@ -42,7 +42,15 @@ fastify.post('/utenti/add', function(req,rep){
     }
   )
 })
-fastify.put()
+fastify.put('/utenti', function(req, rep){
+  fastify.mysql.query(
+    'UPDATE utenti SET utente = test, WHERE ID= 2', [rep.body.utente],
+    function onResult(err, result){
+      rep.send(err || result)
+      console.log(result)
+    }
+  )
+})
 
 fastify.listen({ port: 3000 }, err => {
   if (err) throw err
