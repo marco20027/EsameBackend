@@ -1,0 +1,2 @@
+1. collegare il db e fare le route
+2. collegare il server fastify al frontend

@@ -1,0 +1,17 @@
+{
+  "name": "esamebackend",
+  "version": "1.0.0",
+  "description": "esame",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "marco",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/mysql": "^4.0.0",
+    "fastify": "^4.7.0",
+    "fastify-mysql": "^2.2.0",
+    "mysql": "^2.18.1"
+  }
+}
