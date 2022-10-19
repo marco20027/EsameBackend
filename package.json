@@ -9,7 +9,9 @@
   "author": "marco",
   "license": "ISC",
   "dependencies": {
+    "@fastify/jwt": "^6.3.2",
     "@fastify/mysql": "^4.0.0",
+    "crypto-js": "^4.1.1",
     "fastify": "^4.7.0",
     "fastify-mysql": "^2.2.0",
     "mysql": "^2.18.1"
