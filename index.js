@@ -1,58 +1,116 @@
+const CryptoJS = require("crypto-js");
+const fastify = require('fastify')({ logger: true });
 
-const fastify = require('fastify')({ logger: true })
-
-
-// Run the server!
-const start = async () => {
-  try {
-    await fastify.listen({ port: 3000 })
-  } catch (err) {
-    fastify.log.error(err)
-    process.exit(1)
-  }
-}
-start()
 fastify.register(require('@fastify/mysql'), {
-  connectionString:'mysql://root@localhost/esame'
+    connectionString: 'mysql://root@localhost/esame'
 })
 
-fastify.get('/utenti', function(req, reply) {
-  fastify.mysql.query(
-    'SELECT * FROM utenti ', [req.params.id],
-    function onResult (err, result) {
-      reply.send(err || result)
-    }  
-  )
-})
-fastify.get('/utenti/:id', function(req, reply){
-  fastify.mysql.query(
-    'SELECT ID FROM utenti WHERE ID = 1', [req.params.id],
-    function onResult(err, result){
-      reply.send(err || result)
-    }
-  )
-})
-// metodo post da modificare
-fastify.post('/utenti/add', function(req,rep){
-  fastify.mysql.query(
-    'INSERT INTO utenti (utente) VALUES (utente)',[req.body.utente],
-    function onResult(err, result){
-      rep.send(err || result)
-      console.log(req)
-    }
-  )
-})
-fastify.put('/utenti', function(req, rep){
-  fastify.mysql.query(
-    'UPDATE utenti SET utente = test, WHERE ID= 2', [rep.body.utente],
-    function onResult(err, result){
-      rep.send(err || result)
-      console.log(result)
-    }
-  )
+fastify.register(require('@fastify/jwt'), {
+    secret:'supersecret'
 })
 
-fastify.listen({ port: 3000 }, err => {
-  if (err) throw err
-  console.log(`server listening on ${fastify.server.address().port}`)
+const setup = async () => {
+    await fastify.register(require("@fastify/cors"), {
+        origin: "*"
+    })
+}
+setup();
+
+fastify.route({
+    method: 'GET',
+    url: '/consulenza',
+
+    onRequest:async function (req, reply) {
+        try {
+            await req.jwtVerify()
+        } catch (err) {
+            reply.send(err)
+        }
+    },
+    handler: function (req, reply) {
+        console.log(req.user)
+        fastify.mysql.query(
+            'SELECT * FROM consulenza ',[req.params.id],
+            function onResult(err, result) {
+                reply.send(err || result)
+            }
+        )
+    }
 })
+
+fastify.route({
+    method: 'POST',
+    url: '/consulenza',
+
+    onRequest: async function (req, reply) {
+        try {
+            await req.jwtVerify()
+        } catch (err) {
+            reply.send(err)
+        }
+    },
+
+    handler: function (req, reply) {
+        const prenotazione = {
+            email: req.body.email,
+            consulenza : req.body.consulenza,
+            teefono: req.body.telefono
+        }
+        console.log(req.user)
+        fastify.mysql.query(
+            'INSERT INTO consulenza SET ? ', [prenotazione],
+            function onResult(err, result) {
+                reply.send(err || result)
+            }
+        )
+    }
+})
+
+
+fastify.get('/user', function (req, reply) {
+    fastify.mysql.query(
+        'SELECT * FROM user ',/* [req.params.id],*/
+        function onResult(err, result) {
+            reply.send(err || result)
+        }
+    )
+});
+
+fastify.post('/login', function (req, reply) {
+    try {
+        //const email = req.body.email
+        //const password = req.body.password
+        const { body: { email, password } } = req;
+        const sha1_password = String(Crypto.SHA1(password));
+        console.log(sha1_password)
+
+ fastify.mysql.query(
+     'SELECT * FROM user where email=? AND password=? ', [email, sha1_password],
+     function onResult(err, result) {
+                console.log(err)
+                if (result.length > 0) {
+                    const token = fastify.jwt.sign({ id: result[0].id})
+                    reply.send({token})
+                } else {
+                    reply.code(401).send({success: false, message: "Unauthorized access"})
+                }
+            }
+        )
+    } catch (err) {
+
+    }
+});
+
+
+
+
+const startServer = async () => {
+    try {
+        await fastify.listen(3001);
+    } catch (err) {
+        fastify.log.error(err);
+        process.exit(1);
+    }
+};
+
+startServer();
