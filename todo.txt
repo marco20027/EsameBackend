@@ -1,2 +1,4 @@
-1. collegare il db e fare le route
-2. collegare il server fastify al frontend
+1. collegare il db e fare le route (fatto)
+2. collegare il server fastify al frontend (fatto)
+3.fix API del login (70%)
+4.fix API della prenotazione
