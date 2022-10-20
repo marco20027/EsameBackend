@@ -30,7 +30,7 @@ fastify.route({
     handler: function (req, reply) {
         console.log(req.user)
         fastify.mysql.query(
-            'SELECT * FROM consulenza ',[req.params.id],
+            'SELECT * FROM consulenza ',
             function onResult(err, result) {
                 reply.send(err || result)
             }
@@ -54,7 +54,7 @@ fastify.route({
         const prenotazione = {
             email: req.body.email,
             consulenza : req.body.consulenza,
-            teefono: req.body.telefono
+            telefono: req.body.telefono
         }
         console.log(req.user)
         fastify.mysql.query(
@@ -81,7 +81,7 @@ fastify.post('/login', function (req, reply) {
         //const email = req.body.email
         //const password = req.body.password
         const { body: { email, password } } = req;
-        const sha1_password = String(Crypto.SHA1(password));
+        const sha1_password = String(CryptoJS.SHA1(password));
         console.log(sha1_password)
 
  fastify.mysql.query(
@@ -91,8 +91,10 @@ fastify.post('/login', function (req, reply) {
                 if (result.length > 0) {
                     const token = fastify.jwt.sign({ id: result[0].id})
                     reply.send({token})
+                    console.log(token)
                 } else {
-                    reply.code(401).send({success: false, message: "Unauthorized access"})
+                 reply.code(401).send({success: false, message: "Unauthorized access"})
+                    
                 }
             }
         )
@@ -100,6 +102,35 @@ fastify.post('/login', function (req, reply) {
 
     }
 });
+
+
+fastify.route({
+    method: 'POST',
+    url: '/registrazione',
+
+    onRequest: async function (req, reply) {
+        try {
+            await req.jwtVerify()
+        } catch (err) {
+            reply.send(err)
+        }
+    },
+
+    handler: function (req, reply) {
+        const registrazione = {
+            email: req.body.email,
+            password : req.body.password,
+            confermaPassword: req.body.confermaPassword
+        }
+        console.log(req.user)
+        fastify.mysql.query(
+            'INSERT INTO registrazione SET ? ', [registrazione],
+            function onResult(err, result) {
+                reply.send(err || result)
+            }
+        )
+    }
+})
 
 
 
