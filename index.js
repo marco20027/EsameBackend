@@ -100,6 +100,33 @@ fastify.post('/login', function (req, reply) {
 
     }
 });
+fastify.route({
+    method: 'POST',
+    url: '/registrazione',
+
+    onRequest: async function (req, reply) {
+        try {
+            await req.jwtVerify()
+        } catch (err) {
+            reply.send(err)
+        }
+    },
+
+    handler: function (req, reply) {
+        const registrazione = {
+            email: req.body.email,
+            password : req.body.password,
+            confermaPassword: req.body.confermaPassword
+        }
+        console.log(req.user)
+        fastify.mysql.query(
+            'INSERT INTO registrazione SET ? ', [registrazione],
+            function onResult(err, result) {
+                reply.send(err || result)
+            }
+        )
+    }
+})
 
 
 fastify.route({
