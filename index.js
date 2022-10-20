@@ -78,8 +78,6 @@ fastify.get('/user', function (req, reply) {
 
 fastify.post('/login', function (req, reply) {
     try {
-        //const email = req.body.email
-        //const password = req.body.password
         const { body: { email, password } } = req;
         const sha1_password = String(CryptoJS.SHA1(password));
         console.log(sha1_password)

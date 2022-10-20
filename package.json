@@ -9,7 +9,10 @@
   "author": "marco",
   "license": "ISC",
   "dependencies": {
+<<<<<<< HEAD
     "@fastify/cors": "^8.1.0",
+=======
+>>>>>>> 7a4583f7e4364c4259af3fe590ac2b4c1d68cc88
     "@fastify/jwt": "^6.3.2",
     "@fastify/mysql": "^4.0.0",
     "crypto-js": "^4.1.1",
