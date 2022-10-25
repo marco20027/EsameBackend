@@ -41,7 +41,6 @@ fastify.route({
 fastify.route({
     method: 'POST',
     url: '/consulenza',
-
     onRequest: async function (req, reply) {
         try {
             await req.jwtVerify()
@@ -49,7 +48,6 @@ fastify.route({
             reply.send(err)
         }
     },
-
     handler: function (req, reply) {
         const prenotazione = {
             email: req.body.email,
@@ -75,7 +73,32 @@ fastify.get('/user', function (req, reply) {
         }
     )
 });
+fastify.route({
+    method: 'DELETE',
+    url: '/consulenza/:id',
 
+    onRequest: async function (req, reply) {
+        try {
+            await req.jwtVerify()
+        } catch (err) {
+            reply.send(err)
+        }
+    },
+
+    handler: function (req, reply) {
+        const id = req.params.id;
+
+        console.log(id)
+        
+        console.log(req.user)
+        fastify.mysql.query(
+            'DELETE from consulenza WHERE id=? ', [id],
+            function onResult(err, result) {
+                reply.send(err || result)
+            }
+        )
+    }
+})
 fastify.post('/login', function (req, reply) {
     try {
         const { body: { email, password } } = req;
@@ -100,46 +123,11 @@ fastify.post('/login', function (req, reply) {
 
     }
 });
-fastify.route({
-    method: 'POST',
-    url: '/registrazione',
-
-    onRequest: async function (req, reply) {
-        try {
-            await req.jwtVerify()
-        } catch (err) {
-            reply.send(err)
-        }
-    },
-
-    handler: function (req, reply) {
-        const registrazione = {
-            email: req.body.email,
-            password : req.body.password,
-            confermaPassword: req.body.confermaPassword
-        }
-        console.log(req.user)
-        fastify.mysql.query(
-            'INSERT INTO registrazione SET ? ', [registrazione],
-            function onResult(err, result) {
-                reply.send(err || result)
-            }
-        )
-    }
-})
 
 
 fastify.route({
     method: 'POST',
     url: '/registrazione',
-
-    onRequest: async function (req, reply) {
-        try {
-            await req.jwtVerify()
-        } catch (err) {
-            reply.send(err)
-        }
-    },
 
     handler: function (req, reply) {
         const registrazione = {
